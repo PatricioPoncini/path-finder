@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.env
+# Datos personales del usuario (CV, perfil, preferencias, historial, reportes)
+data/
