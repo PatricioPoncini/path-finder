@@ -6,9 +6,11 @@ from path_finder.prefs import default_regions, normalize_seniority, preferences_
 from path_finder.sources.arbeitnow import Arbeitnow
 from path_finder.sources.base import search_queries
 from path_finder.sources.himalayas import Himalayas
+from path_finder.sources.jobicy import Jobicy
 from path_finder.sources.remoteok import RemoteOK
 from path_finder.sources.remotive import Remotive
 from path_finder.sources.weworkremotely import WeWorkRemotely
+from path_finder.sources.workingnomads import WorkingNomads
 
 RSS = """<?xml version="1.0"?><rss><channel>
 <item><title>Acme: Senior Go Engineer</title><region>USA Only</region><country></country>
@@ -57,6 +59,33 @@ def test_wwr_parse_feed():
     assert [j.company for j in jobs] == ["Acme", "Globex"]
     assert jobs[0].title == "Senior Go Engineer" and jobs[0].location_restrictions == ["USA Only"]
     assert jobs[1].location_restrictions == [] and jobs[0].description == "Build things"
+
+
+def test_jobicy_parse_geo_and_lists():
+    job = Jobicy._parse({"id": "159", "url": "https://jobicy.com/jobs/159", "jobTitle": "Python Dev", "companyName": "Doc",
+                         "jobIndustry": "['Software Engineering']", "jobType": "['Full-Time']", "jobGeo": "LATAM,  Canada,  USA",
+                         "jobLevel": "Senior", "jobDescription": "<p>x</p>", "pubDate": "2026-11-05T20:05:49+00:00"})
+    assert job.id == "jobicy:159" and job.location_restrictions == ["LATAM", "Canada", "USA"]
+    assert job.tags == ["Software Engineering", "Full-Time", "Senior"] and job.description == "x"
+    assert Jobicy._parse({"id": "1", "jobGeo": "Anywhere"}).location_restrictions == []
+    # la API real manda listas, no texto
+    real = Jobicy._parse({"id": "2", "jobTitle": "X", "jobIndustry": ["Software Engineering"], "jobType": ["Full-Time"],
+                          "jobGeo": ["Mexico", "LATAM"], "jobLevel": "Any"})
+    assert real.tags == ["Software Engineering", "Full-Time"] and real.location_restrictions == ["Mexico", "LATAM"]
+
+
+def test_workingnomads_parse():
+    base = {"url": "https://www.workingnomads.com/job/go/1996233/", "title": "Dev", "company_name": "C",
+            "tags": "go,aws", "category_name": "Development", "pub_date": "2026-11-05T03:10:45-05:00", "description": "<p>d</p>"}
+    job = WorkingNomads._parse(dict(base, location="Europe, LATAM, APAC"))
+    assert job.id == "workingnomads:1996233" and job.location_restrictions == ["Europe, LATAM, APAC"]
+    assert job.tags == ["go", "aws", "Development"] and job.remote is True
+    assert WorkingNomads._parse(dict(base, location="Global")).location_restrictions == []
+
+
+def test_no_source_needs_keys_or_config():
+    from path_finder.sources import SOURCES
+    assert "adzuna" not in SOURCES and not any(hasattr(s, "requires_key") for s in SOURCES.values())
 
 
 def test_search_queries_strip_seniority():

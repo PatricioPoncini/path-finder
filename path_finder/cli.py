@@ -137,6 +137,10 @@ def cmd_search(args: argparse.Namespace) -> int:
     if args.sources:
         prefs.sources = split_list(args.sources)
     prefs.areas = prefs.areas or profile.areas  # las fuentes eligen categorías según las áreas
+    inactive = [n for n in SOURCES if n not in active_sources(prefs)]
+    if inactive and not args.sources:
+        console.print("[dim]Fuentes disponibles que no tenés activas: %s (sumalas en `sources:` de %s)[/dim]"
+                      % (", ".join(inactive), config.prefs_path()))
     if not (profile.skills or profile.primary_stack):
         console.print("[yellow]Tu perfil no tiene skills: el ranking será pobre. Editá %s o corré `path-finder profile --refresh`.[/yellow]" % config.profile_path())
 
@@ -241,10 +245,10 @@ def cmd_areas(args: argparse.Namespace) -> int:
 def cmd_sources(args: argparse.Namespace) -> int:
     enabled = active_sources(config.load_prefs()) if config.prefs_path().is_file() else []
     t = Table()
-    for col in ("Fuente", "Activa", "Disponible", "Sitio"):
+    for col in ("Fuente", "Activa", "Sitio"):
         t.add_column(col)
     for name, s in SOURCES.items():
-        t.add_row(name, "sí" if name in enabled else "no", s.available() or "sí", s.homepage)
+        t.add_row(name, "sí" if name in enabled else "no", s.homepage)
     console.print(t)
     console.print("Activá/desactivá fuentes en `sources:` de %s" % config.prefs_path())
     return 0

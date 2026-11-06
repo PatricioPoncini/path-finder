@@ -65,6 +65,8 @@ Para probar sin tocar `data/`: `PATH_FINDER_HOME=/ruta/temporal path-finder ...`
   `location_restrictions` estructuradas (Remotive, Himalayas, WWR) que no matcheen `eligible_regions`; (2) `ranking.eligibility`
   usa esas restricciones y patrones del texto; si es `no`, el score se limita a 25. Las fuentes que solo dan `location` informal
   (Remote OK, Arbeitnow) NO llenan `location_restrictions` a propósito.
+- **Ninguna fuente puede requerir clave, cuenta ni configuración** (decisión del usuario; por eso se sacó Adzuna y no hay `.env` obligatorio).
+  Si una API pide credenciales, no se agrega. Jobicy exige acreditarla con link a la oferta original (el reporte ya lo hace).
 - **Fuentes y términos de uso**: Remotive y Remote OK exigen atribución y link a la oferta original (el reporte ya lo hace);
   no republicar sus ofertas en sitios de terceros. Respetar rate limits (Arbeitnow pide no abusar).
 - **LinkedIn NO está integrado, a propósito**: scrapear con sesión logueada viola sus términos y arriesga la cuenta. La URL de
@@ -86,8 +88,7 @@ Para probar sin tocar `data/`: `PATH_FINDER_HOME=/ruta/temporal path-finder ...`
 ## Estado
 
 - Verificado contra las APIs reales: Remotive, Remote OK, Himalayas, We Work Remotely, Arbeitnow (esquemas al 2026-11-04).
-- `getonbrd` verificada contra su API real el 2026-11-05 (`/api/v0/search/jobs?remote=true`). Adzuna: la ruta `/ar/` no se pudo confirmar sin credenciales.
-- `adzuna` está implementada pero **no se verificó con credenciales reales**.
+- `getonbrd`, `jobicy` y `workingnomads` verificadas contra sus APIs reales el 2026-11-05 (`/api/v0/search/jobs?remote=true`, `/api/v2/remote-jobs`, `/api/exposed_jobs/`).
 - Verificado con búsquedas reales (2026-11-05): CV de developer (el de Patricio), y CV de ejemplo de PM, diseño y datos (`tests/fixtures/cv_*.txt`),
   con resultados del área correcta en el top. WWR no tiene categoría de datos; Remote OK solo filtra bien por algunos tags (`product-manager`, `designer`,
   `data-science`): el filtro local de título limpia el resto. Remotive: no se usa `category=` (devolvió lo mismo para todo).

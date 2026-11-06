@@ -4,17 +4,19 @@ from __future__ import annotations
 from typing import Dict, List, Tuple
 
 from ..models import Job, Preferences
-from .adzuna import Adzuna
 from .arbeitnow import Arbeitnow
 from .base import Source, make_client
 from .getonbrd import GetOnBoard
 from .himalayas import Himalayas
+from .jobicy import Jobicy
 from .remoteok import RemoteOK
 from .remotive import Remotive
 from .weworkremotely import WeWorkRemotely
+from .workingnomads import WorkingNomads
 
 SOURCES: Dict[str, Source] = {
-    s.name: s for s in (Remotive(), RemoteOK(), Himalayas(), WeWorkRemotely(), Arbeitnow(), GetOnBoard(), Adzuna())
+    s.name: s for s in (Remotive(), RemoteOK(), Himalayas(), WeWorkRemotely(), Arbeitnow(), GetOnBoard(), Jobicy(),
+                                WorkingNomads())
 }
 
 
@@ -39,10 +41,6 @@ def fetch_all(prefs: Preferences, progress=None) -> Tuple[List[Job], Dict[str, s
             source = SOURCES.get(name)
             if source is None:
                 problems[name] = "fuente desconocida (válidas: %s)" % ", ".join(SOURCES)
-                continue
-            reason = source.available()
-            if reason:
-                problems[name] = "omitida: %s" % reason
                 continue
             try:
                 got = source.fetch(prefs, client)

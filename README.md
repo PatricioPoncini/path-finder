@@ -158,17 +158,19 @@ los viejos; subilo si ves pocos resultados.
 
 ## Fuentes de ofertas
 
-| Fuente | Clave | Notas |
+| Fuente | Config | Notas |
 |---|---|---|
-| Remotive | no | Solo remoto; exige atribución |
-| Remote OK | no | Últimas ~100 ofertas + las de los tags del área; exige atribución |
-| Himalayas | no | Buen dato de restricciones por país |
-| We Work Remotely | no | Feeds RSS: general + categorías de tus áreas (programación, producto, diseño) |
-| Arbeitnow | no | Foco Alemania/Europa; muchas no son remotas |
-| Get on Board | no | Foco LATAM, muchas ofertas en español; se activa solo si `job_languages` incluye `es`; recorre las categorías de tus áreas |
-| Adzuna | sí (gratis) | Requiere `ADZUNA_APP_ID`/`ADZUNA_APP_KEY` en `.env`. **Sin verificar con credenciales reales** |
+| Remotive | ninguna | Solo remoto; exige atribución |
+| Remote OK | ninguna | Últimas ~100 ofertas + las de los tags del área; exige atribución |
+| Himalayas | ninguna | Buen dato de restricciones por país |
+| We Work Remotely | ninguna | Feeds RSS: general + categorías de tus áreas (programación, producto, diseño) |
+| Arbeitnow | ninguna | Foco Alemania/Europa; muchas no son remotas |
+| Get on Board | ninguna | Foco LATAM, muchas ofertas en español; se activa solo si `job_languages` incluye `es`; recorre las categorías de tus áreas |
+| Jobicy | ninguna | Ofertas remotas con países permitidos; exige acreditar a Jobicy con link (el reporte lo hace) |
+| Working Nomads | ninguna | Últimas ~30 ofertas remotas |
 
-El reporte incluye siempre el link a la oferta original y la fuente, como piden los términos de Remotive y Remote OK.
+**Ninguna fuente pide clave, cuenta ni configuración**: es una regla del proyecto (se descartó Adzuna por requerir una).
+El reporte incluye siempre el link a la oferta original y la fuente, como piden los términos de Remotive, Remote OK y Jobicy.
 No republiques sus ofertas en otros sitios.
 
 ## LinkedIn

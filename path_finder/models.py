@@ -132,7 +132,8 @@ class Preferences:
     max_age_days: int = 30
     min_score: int = 40
     sources: List[str] = field(
-        default_factory=lambda: ["remotive", "remoteok", "himalayas", "weworkremotely", "arbeitnow", "getonbrd"]
+        default_factory=lambda: ["remotive", "remoteok", "himalayas", "weworkremotely", "arbeitnow", "getonbrd",
+                 "jobicy", "workingnomads"]
     )
 
     def to_dict(self) -> Dict[str, Any]:

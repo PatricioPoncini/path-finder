@@ -56,15 +56,11 @@ class Source:
     """Una fuente devuelve ofertas normalizadas. Las excepciones las captura el runner."""
 
     name = ""
+    # Regla del proyecto: ninguna fuente puede requerir claves ni configuración.
     label = ""  # nombre a mostrar/atribuir en el reporte
     homepage = ""
-    requires_key = False
     # Si el usuario acepta alguno de estos idiomas, la fuente se activa sola aunque no esté en `sources`
     auto_languages: Tuple[str, ...] = ()
-
-    def available(self) -> Optional[str]:
-        """None si se puede usar; si no, el motivo (ej. falta una clave)."""
-        return None
 
     def fetch(self, prefs: Preferences, client: httpx.Client) -> List[Job]:
         raise NotImplementedError
