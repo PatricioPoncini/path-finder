@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "jobbot"
+name = "path-finder"
 version = "0.1.0"
 description = "Buscador de empleos que reúne ofertas de fuentes públicas y las ordena según tu CV, con reglas locales (sin IA)"
 readme = "README.md"
@@ -19,13 +19,13 @@ dependencies = [
 dev = ["pytest>=8.0"]
 
 [project.scripts]
-jobbot = "jobbot.cli:main"
+path-finder = "path_finder.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["jobbot*"]
+include = ["path_finder*"]
 
 [tool.setuptools.package-data]
-"jobbot.areas" = ["*.yaml"]
+"path_finder.areas" = ["*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

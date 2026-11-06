@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from jobbot.models import Match
-from jobbot.ranking import eligibility, rank_job, rank_jobs, required_years, salary_max, title_level
-from jobbot.report import build_entries, render_html, render_markdown
-from jobbot.store import Store
+from path_finder.models import Match
+from path_finder.ranking import eligibility, rank_job, rank_jobs, required_years, salary_max, title_level
+from path_finder.report import build_entries, render_html, render_markdown
+from path_finder.store import Store
 
 from .conftest import make_job
 

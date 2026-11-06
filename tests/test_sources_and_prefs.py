@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from jobbot import config
-from jobbot.models import Preferences, Profile, html_to_text
-from jobbot.prefs import default_regions, normalize_seniority, preferences_from_profile, run_wizard
-from jobbot.sources.arbeitnow import Arbeitnow
-from jobbot.sources.base import search_queries
-from jobbot.sources.himalayas import Himalayas
-from jobbot.sources.remoteok import RemoteOK
-from jobbot.sources.remotive import Remotive
-from jobbot.sources.weworkremotely import WeWorkRemotely
+from path_finder import config
+from path_finder.models import Preferences, Profile, html_to_text
+from path_finder.prefs import default_regions, normalize_seniority, preferences_from_profile, run_wizard
+from path_finder.sources.arbeitnow import Arbeitnow
+from path_finder.sources.base import search_queries
+from path_finder.sources.himalayas import Himalayas
+from path_finder.sources.remoteok import RemoteOK
+from path_finder.sources.remotive import Remotive
+from path_finder.sources.weworkremotely import WeWorkRemotely
 
 RSS = """<?xml version="1.0"?><rss><channel>
 <item><title>Acme: Senior Go Engineer</title><region>USA Only</region><country></country>
@@ -90,7 +90,7 @@ def test_preferences_from_profile_and_wizard():
 
 
 def test_prefs_roundtrip_and_old_fields_ignored(tmp_path, monkeypatch):
-    monkeypatch.setenv("JOBBOT_HOME", str(tmp_path))
+    monkeypatch.setenv("PATH_FINDER_HOME", str(tmp_path))
     prefs = Preferences(target_roles=["Data Analyst"], preferred_stack=["SQL"])
     config.save_prefs(prefs)
     loaded = config.load_prefs()

@@ -1,6 +1,6 @@
 """Paquetes de área: vocabulario de skills, catálogo de roles, fuentes y pesos por profesión.
 
-Cada área es un YAML (`jobbot/areas/*.yaml`). El usuario puede sumar o pisar áreas con `data/areas/*.yaml`
+Cada área es un YAML (`path_finder/areas/*.yaml`). El usuario puede sumar o pisar áreas con `data/areas/*.yaml`
 sin tocar código. Ver README ("Áreas").
 """
 from __future__ import annotations

@@ -1,4 +1,4 @@
-# jobbot
+# path-finder
 
 Buscador de empleos que **lee tu CV, trae ofertas de varias fuentes públicas y las ordena según lo que vos buscás**.
 Te deja un reporte (Markdown y HTML) con un score de 0 a 100, por qué encaja, qué le falta y, algo clave si vivís fuera
@@ -15,11 +15,11 @@ una vez y de ahí salen las búsquedas. Sirve para **developers, producto (PM/PO
 ## Instalación
 
 ```bash
-git clone <este-repo> jobbot && cd jobbot
+git clone <este-repo> path-finder && cd path-finder
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip          # el pip viejo de macOS no instala proyectos con pyproject
 .venv/bin/pip install -e .
-source .venv/bin/activate                    # para usar `jobbot` directo (si no: .venv/bin/jobbot)
+source .venv/bin/activate                    # para usar `path-finder` directo (si no: .venv/bin/path-finder)
 ```
 
 ## Uso
@@ -27,7 +27,7 @@ source .venv/bin/activate                    # para usar `jobbot` directo (si no
 ### 1. Configurar (una sola vez)
 
 ```bash
-jobbot init
+path-finder init
 ```
 
 Te pide la ruta de tu CV (PDF con texto seleccionable, `.txt` o `.md`) y **detecta áreas, skills, años de experiencia, país y
@@ -38,15 +38,15 @@ tecnologías que preferís o querés evitar y palabras a excluir. Cada pregunta 
 
 Se guarda en `data/profile.json` y `data/preferences.yaml`, ambos editables a mano.
 
-Modo no interactivo: `jobbot init --cv mi_cv.pdf --roles "Sr Software Engineer" --country Argentina --modes remote --job-languages es --yes`
+Modo no interactivo: `path-finder init --cv mi_cv.pdf --roles "Sr Software Engineer" --country Argentina --modes remote --job-languages es --yes`
 
-Ejemplos con atajos: `jobbot init --cv cv.pdf --roles "Sr PM, PO" --yes` (producto), `--roles "TL"` (tech lead),
+Ejemplos con atajos: `path-finder init --cv cv.pdf --roles "Sr PM, PO" --yes` (producto), `--roles "TL"` (tech lead),
 `--roles "UX/UI Designer, Sr Product Designer" --areas design`.
 
 ### 2. Buscar
 
 ```bash
-jobbot search
+path-finder search
 ```
 
 Trae las ofertas, filtra, ordena y deja el reporte en `data/reports/AAAA-MM-DD_HHMMSS.html` (y `.md`) más el top 10 en la
@@ -62,20 +62,20 @@ terminal. Las ofertas que aparecen por primera vez se marcan como **nueva**.
 ### 3. Llevar el seguimiento
 
 ```bash
-jobbot mark applied himalayas:82565a736b    # applied | saved | discarded | new  (el ID aparece en el reporte)
-jobbot history --status applied
+path-finder mark applied himalayas:82565a736b    # applied | saved | discarded | new  (el ID aparece en el reporte)
+path-finder history --status applied
 ```
 
 Las ofertas `applied` y `discarded` no vuelven a aparecer en búsquedas futuras.
 
 ### Otros comandos
 
-`jobbot profile` (ver el perfil; `--refresh --cv nuevo.pdf` lo regenera), `jobbot prefs` (ver; `--edit` para rehacer el
-asistente), `jobbot sources` (fuentes disponibles), `jobbot roles` (roles comunes y atajos), `jobbot areas` (áreas cargadas).
+`path-finder profile` (ver el perfil; `--refresh --cv nuevo.pdf` lo regenera), `path-finder prefs` (ver; `--edit` para rehacer el
+asistente), `path-finder sources` (fuentes disponibles), `path-finder roles` (roles comunes y atajos), `path-finder areas` (áreas cargadas).
 
 ## Áreas y roles comunes
 
-Cada **área** es un paquete YAML (`jobbot/areas/*.yaml`) con su vocabulario de skills (con alias), catálogo de roles (en
+Cada **área** es un paquete YAML (`path_finder/areas/*.yaml`) con su vocabulario de skills (con alias), catálogo de roles (en
 inglés y español), categorías de las fuentes que le corresponden y los pesos del ranking. Vienen cuatro:
 
 | Área | Id | Roles que reconoce (ejemplos) |
@@ -95,8 +95,8 @@ Engineer senior. Cualquier otro texto se busca tal cual. Los niveles son `junior
 "Product Manager" es un rol, no un nivel: el nivel sale de palabras como *Senior*, *Staff*, *Group*, *Director*.
 
 **Agregar un área propia** (por ejemplo, legal o marketing): creá `data/areas/<id>.yaml` con las claves de
-`jobbot/areas/product.yaml` (`id`, `label`, `skills`, `roles` son obligatorias; el resto es opcional). Se suma a las incluidas,
-o pisa una con el mismo `id`. Verificalo con `jobbot areas`.
+`path_finder/areas/product.yaml` (`id`, `label`, `skills`, `roles` son obligatorias; el resto es opcional). Se suma a las incluidas,
+o pisa una con el mismo `id`. Verificalo con `path-finder areas`.
 
 ## Cómo se calcula el score
 
@@ -126,7 +126,7 @@ located in…", "authorized to work in the US", y menciones de tu región o de "
 
 ## Idioma de las ofertas
 
-`job_languages: [es]` hace que jobbot descarte las ofertas cuya descripción no esté en español. El idioma se detecta del texto
+`job_languages: [es]` hace que path-finder descarte las ofertas cuya descripción no esté en español. El idioma se detecta del texto
 con un conteo de palabras frecuentes (es, en, pt, it, de, fr), sin dependencias. Si el texto es muy corto o ambiguo, la oferta
 **se conserva** (no se descarta por duda). Las ofertas bilingües se clasifican por el idioma dominante del texto.
 
@@ -173,7 +173,7 @@ No republiques sus ofertas en otros sitios.
 
 ## LinkedIn
 
-jobbot **no** consulta LinkedIn. Automatizar tu sesión viola sus términos de uso y puede restringir o bloquear tu cuenta.
+path-finder **no** consulta LinkedIn. Automatizar tu sesión viola sus términos de uso y puede restringir o bloquear tu cuenta.
 Podés guardar tu URL (`--linkedin`) y pasar con `--extra-text` un archivo con el texto de tu perfil para sumar skills a la
 detección. Si querés cubrir LinkedIn, las formas seguras son sus alertas de empleo por email o copiar a mano las ofertas.
 
@@ -185,7 +185,7 @@ de tu equipo son las consultas HTTP a las fuentes públicas de ofertas; tu CV no
 ## Limitaciones
 
 - El perfil sale de vocabularios por área (tecnología, producto, diseño, datos). Para otra profesión, creá un área propia
-  en `data/areas/` o cargá tus skills a mano en `jobbot init` / `data/profile.json`.
+  en `data/areas/` o cargá tus skills a mano en `path-finder init` / `data/profile.json`.
 - Producto y diseño: sus avisos son más genéricos, así que el score discrimina menos que en tecnología. Usá `must_have`
   (industria, tipo de producto) para afinarlo.
 - El score son reglas, no comprensión del texto: sirve para priorizar, no para decidir por vos. Una oferta puede mencionar

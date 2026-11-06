@@ -81,7 +81,7 @@ def render_markdown(profile: Profile, prefs: Preferences, entries: List[Entry], 
             lines += ["**A tener en cuenta:**"] + ["- " + g for g in m.gaps] + [""]
         lines.append("[Ver oferta](%s) · Fuente: %s · `ID: %s`" % (j.url, attribution(j.source), j.id))
         lines.append("")
-    lines += ["---", FOOTER, "Marcá el estado con `jobbot mark applied|saved|discarded <ID>`."]
+    lines += ["---", FOOTER, "Marcá el estado con `path-finder mark applied|saved|discarded <ID>`."]
     return "\n".join(lines) + "\n"
 
 
@@ -104,7 +104,7 @@ def render_html(profile: Profile, prefs: Preferences, entries: List[Entry], stat
     parts = [
         "<!doctype html><html lang='es'><head><meta charset='utf-8'>",
         "<meta name='viewport' content='width=device-width,initial-scale=1'>",
-        "<title>Ofertas — jobbot</title><style>%s</style></head><body><main>" % CSS,
+        "<title>Ofertas — path-finder</title><style>%s</style></head><body><main>" % CSS,
         "<h1>Ofertas para %s</h1>" % esc(profile.name or "vos"),
         "<p class='meta'>%s</p>" % "<br>".join(esc(l) for l in _header_lines(profile, prefs, entries, stats)),
     ]

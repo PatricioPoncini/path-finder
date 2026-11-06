@@ -9,7 +9,7 @@ import yaml
 from .models import Preferences, Profile
 
 PREFS_HEADER = """\
-# Preferencias de búsqueda de jobbot. Editá este archivo a mano o corré `jobbot init --prefs-only`.
+# Preferencias de búsqueda de path-finder. Editá este archivo a mano o corré `path-finder init --prefs-only`.
 # Qué significa cada campo: ver README.md (sección "Preferencias").
 """
 
@@ -19,7 +19,7 @@ class SetupError(RuntimeError):
 
 
 def home_dir() -> Path:
-    return Path(os.environ.get("JOBBOT_HOME") or (Path.cwd() / "data")).expanduser()
+    return Path(os.environ.get("PATH_FINDER_HOME") or (Path.cwd() / "data")).expanduser()
 
 
 def profile_path() -> Path:
@@ -62,7 +62,7 @@ def save_profile(profile: Profile) -> None:
 
 def load_profile() -> Profile:
     if not profile_path().is_file():
-        raise SetupError("No hay perfil todavía. Corré primero: jobbot init")
+        raise SetupError("No hay perfil todavía. Corré primero: path-finder init")
     return Profile.from_dict(json.loads(profile_path().read_text(encoding="utf-8")))
 
 
@@ -74,5 +74,5 @@ def save_prefs(prefs: Preferences) -> None:
 
 def load_prefs() -> Preferences:
     if not prefs_path().is_file():
-        raise SetupError("No hay preferencias todavía. Corré primero: jobbot init")
+        raise SetupError("No hay preferencias todavía. Corré primero: path-finder init")
     return Preferences.from_dict(yaml.safe_load(prefs_path().read_text(encoding="utf-8")) or {})

@@ -1,7 +1,7 @@
 """Extracción del perfil a partir del CV (PDF/txt/md) con reglas, sin IA.
 
 Es una aproximación: detecta tecnologías contra un vocabulario, estima los años de experiencia
-por rangos de fechas y sugiere puestos por títulos conocidos. `jobbot init` muestra el resultado
+por rangos de fechas y sugiere puestos por títulos conocidos. `path-finder init` muestra el resultado
 y deja corregirlo.
 """
 from __future__ import annotations

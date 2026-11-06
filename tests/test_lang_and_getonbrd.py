@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from jobbot.filters import apply_filters, norm_title, role_phrases
-from jobbot.lang import detect_language, normalize_languages
-from jobbot.sources import active_sources
-from jobbot.sources.getonbrd import GetOnBoard, spanish_queries
+from path_finder.filters import apply_filters, norm_title, role_phrases
+from path_finder.lang import detect_language, normalize_languages
+from path_finder.sources import active_sources
+from path_finder.sources.getonbrd import GetOnBoard, spanish_queries
 
 from .conftest import make_job
 

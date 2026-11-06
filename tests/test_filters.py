@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from jobbot.filters import apply_filters, contains_term, role_phrases
+from path_finder.filters import apply_filters, contains_term, role_phrases
 
 from .conftest import make_job
 

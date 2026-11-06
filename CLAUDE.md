@@ -1,4 +1,4 @@
-# CLAUDE.md — jobbot
+# CLAUDE.md — path-finder
 
 Bot de búsqueda de empleo **sin IA**: trae ofertas de fuentes públicas, las filtra y las ordena contra el CV del usuario con
 reglas locales. **Es genérico**: nada de la persona que lo creó está hardcodeado; todo sale de `data/profile.json` (extraído
@@ -9,20 +9,20 @@ del CV) y `data/preferences.yaml` (lo que busca). Documentación para humanos: `
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"   # requiere pip >= 21.3 (actualizar pip del venv)
 .venv/bin/python -m pytest -q          # tests (la red está simulada)
-.venv/bin/jobbot init                  # CV -> perfil + preferencias
-.venv/bin/jobbot search                # fuentes reales -> filtros -> ranking -> reporte
+.venv/bin/path-finder init                  # CV -> perfil + preferencias
+.venv/bin/path-finder search                # fuentes reales -> filtros -> ranking -> reporte
 ```
 
-Para probar sin tocar `data/`: `JOBBOT_HOME=/ruta/temporal jobbot ...`.
+Para probar sin tocar `data/`: `PATH_FINDER_HOME=/ruta/temporal path-finder ...`.
 
-## Pipeline y módulos (`jobbot/`)
+## Pipeline y módulos (`path_finder/`)
 
 `sources/*` → `filters.py` → `store.py` (historial) → `ranking.py` → `report.py`; `cli.py` orquesta.
 
 | Módulo | Responsabilidad |
 |---|---|
 | `models.py` | `Job`, `Match`, `Profile`, `Preferences` (dataclasses), `html_to_text`, `stable_hash` |
-| `config.py` | Rutas (`JOBBOT_HOME` o `./data`), `.env`, carga/guardado de perfil y preferencias; `SetupError` = error para mostrar al usuario tal cual |
+| `config.py` | Rutas (`PATH_FINDER_HOME` o `./data`), `.env`, carga/guardado de perfil y preferencias; `SetupError` = error para mostrar al usuario tal cual |
 | `areas/` | Paquetes de área (`tech`, `product`, `design`, `data` en YAML) + `load_areas()`/`resolve()`/`vocabulary()`. Cada YAML: `skills` (con alias), `concepts`, `ambiguous`, `roles`, `title_nouns`, `feeds`, `weights`. El usuario suma/pisa áreas con `data/areas/*.yaml` |
 | `roles.py` | Niveles (`junior<mid<senior<lead<expert<head`), `title_level`, `level_fit`, presets de roles comunes (`PRESETS`), `resolve_role("Sr PM")` |
 | `countries.py` | Países que se detectan en el encabezado de un CV |
@@ -42,7 +42,7 @@ Para probar sin tocar `data/`: `JOBBOT_HOME=/ruta/temporal jobbot ...`.
   opcional enchufable, no mezclado en `ranking.py`.
 - **Python 3.9 compatible** (es el del sistema en macOS): `from __future__ import annotations` en todos los módulos, sin
   `match`, sin `X | Y` fuera de anotaciones, `typing.List/Dict/Optional` en dataclasses.
-- **IDs**: `"<fuente>:<id>"`. Si la fuente solo tiene URL, usar `stable_hash(url)[:10]` (los IDs los tipea el usuario en `jobbot mark`).
+- **IDs**: `"<fuente>:<id>"`. Si la fuente solo tiene URL, usar `stable_hash(url)[:10]` (los IDs los tipea el usuario en `path-finder mark`).
 - **Pesos del ranking**: constantes al inicio de `ranking.py` (tabla en el README). Si las cambiás, actualizá la tabla y los tests.
   El score no se persiste: se recalcula en cada corrida y en `history`.
 - **Idioma de la oferta** (`Preferences.job_languages`): `filters.job_language` detecta del texto (y usa `Job.language` de la fuente
@@ -78,7 +78,7 @@ Para probar sin tocar `data/`: `JOBBOT_HOME=/ruta/temporal jobbot ...`.
 
 ## Cómo agregar una fuente
 
-1. `jobbot/sources/<nombre>.py`: clase que hereda de `Source`, con `name`, `label`, `homepage` y `fetch(prefs, client) -> List[Job]`
+1. `path_finder/sources/<nombre>.py`: clase que hereda de `Source`, con `name`, `label`, `homepage` y `fetch(prefs, client) -> List[Job]`
    (parseo en un `@staticmethod _parse(item)` para testearlo). Poblar `location_restrictions` solo si la fuente lo da estructurado.
 2. Registrarla en `SOURCES` (`sources/__init__.py`) y, si corresponde, en el default de `Preferences.sources`.
 3. Test del parseo con un item de ejemplo en `tests/test_sources_and_prefs.py`. Verificar primero el esquema real con `curl`.
@@ -91,5 +91,5 @@ Para probar sin tocar `data/`: `JOBBOT_HOME=/ruta/temporal jobbot ...`.
 - Verificado con búsquedas reales (2026-11-05): CV de developer (el de Patricio), y CV de ejemplo de PM, diseño y datos (`tests/fixtures/cv_*.txt`),
   con resultados del área correcta en el top. WWR no tiene categoría de datos; Remote OK solo filtra bien por algunos tags (`product-manager`, `designer`,
   `data-science`): el filtro local de título limpia el resto. Remotive: no se usa `category=` (devolvió lo mismo para todo).
-- `jobbot init` y `jobbot search` corridos de punta a punta con un CV real (PDF): detecta nombre, país, ~4 años y el stack.
+- `path-finder init` y `path-finder search` corridos de punta a punta con un CV real (PDF): detecta nombre, país, ~4 años y el stack.
   Ranking calibrado a ojo con una corrida real (min_score por defecto 40); los pesos se pueden ajustar con más uso.

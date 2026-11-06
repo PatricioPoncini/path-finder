@@ -9,7 +9,7 @@ import httpx
 
 from ..models import Job, Preferences
 
-USER_AGENT = "jobbot/0.1 (personal job search tool)"
+USER_AGENT = "path-finder/0.1 (personal job search tool)"
 TIMEOUT = 25.0
 
 SENIORITY_WORDS = {

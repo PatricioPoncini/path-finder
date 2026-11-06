@@ -6,19 +6,19 @@ from pathlib import Path
 import httpx
 import pytest
 
-from jobbot import areas as areas_mod
-from jobbot import config
-from jobbot.config import SetupError
-from jobbot.filters import apply_filters, role_forms_split, role_in_title
-from jobbot.models import Preferences, Profile
-from jobbot.prefs import menu_presets, pick_roles, run_wizard
-from jobbot.profile import detect_areas, extract_profile
-from jobbot.ranking import rank_job
-from jobbot.roles import level_fit, resolve_role, resolve_roles, title_level
-from jobbot.sources.base import search_queries
-from jobbot.sources.getonbrd import GetOnBoard
-from jobbot.sources.remoteok import RemoteOK
-from jobbot.sources.weworkremotely import GENERAL_FEED, feeds_for
+from path_finder import areas as areas_mod
+from path_finder import config
+from path_finder.config import SetupError
+from path_finder.filters import apply_filters, role_forms_split, role_in_title
+from path_finder.models import Preferences, Profile
+from path_finder.prefs import menu_presets, pick_roles, run_wizard
+from path_finder.profile import detect_areas, extract_profile
+from path_finder.ranking import rank_job
+from path_finder.roles import level_fit, resolve_role, resolve_roles, title_level
+from path_finder.sources.base import search_queries
+from path_finder.sources.getonbrd import GetOnBoard
+from path_finder.sources.remoteok import RemoteOK
+from path_finder.sources.weworkremotely import GENERAL_FEED, feeds_for
 
 from .conftest import make_job
 
@@ -54,7 +54,7 @@ def test_builtin_areas_are_valid():
 
 
 def test_user_areas_add_and_override(tmp_path, monkeypatch):
-    monkeypatch.setenv("JOBBOT_HOME", str(tmp_path))
+    monkeypatch.setenv("PATH_FINDER_HOME", str(tmp_path))
     areas_mod.clear_cache()
     (tmp_path / "areas").mkdir()
     (tmp_path / "areas" / "legal.yaml").write_text(

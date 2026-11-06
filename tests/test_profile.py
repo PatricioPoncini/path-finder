@@ -4,9 +4,9 @@ from datetime import date
 
 import pytest
 
-from jobbot.config import SetupError
-from jobbot.prefs import review_profile
-from jobbot.profile import (detect_country, detect_name, detect_roles, detect_skills, experience_months,
+from path_finder.config import SetupError
+from path_finder.prefs import review_profile
+from path_finder.profile import (detect_country, detect_name, detect_roles, detect_skills, experience_months,
                             extract_profile, read_cv)
 
 CV = """JUAN PEREZ

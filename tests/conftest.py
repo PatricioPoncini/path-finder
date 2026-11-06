@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from jobbot.models import Job, Preferences, Profile
+from path_finder.models import Job, Preferences, Profile
 
 
 @pytest.fixture

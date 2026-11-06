@@ -84,7 +84,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     prefs = base if args.yes else run_wizard(base, _ask, profile)
     config.save_prefs(prefs)
     console.print("[green]Preferencias guardadas[/green] en %s (podés editarlas a mano)." % config.prefs_path())
-    console.print("Siguiente paso: [bold]jobbot search[/bold]  ")
+    console.print("Siguiente paso: [bold]path-finder search[/bold]  ")
     return 0
 
 
@@ -124,7 +124,7 @@ def cmd_prefs(args: argparse.Namespace) -> int:
         return cmd_init(args)
     config.load_prefs()  # valida que exista
     console.print(config.prefs_path().read_text(encoding="utf-8"))
-    console.print("Archivo: %s  (editalo a mano o con `jobbot prefs --edit`)" % config.prefs_path())
+    console.print("Archivo: %s  (editalo a mano o con `path-finder prefs --edit`)" % config.prefs_path())
     return 0
 
 
@@ -138,7 +138,7 @@ def cmd_search(args: argparse.Namespace) -> int:
         prefs.sources = split_list(args.sources)
     prefs.areas = prefs.areas or profile.areas  # las fuentes eligen categorías según las áreas
     if not (profile.skills or profile.primary_stack):
-        console.print("[yellow]Tu perfil no tiene skills: el ranking será pobre. Editá %s o corré `jobbot profile --refresh`.[/yellow]" % config.profile_path())
+        console.print("[yellow]Tu perfil no tiene skills: el ranking será pobre. Editá %s o corré `path-finder profile --refresh`.[/yellow]" % config.profile_path())
 
     with console.status("Buscando ofertas…"):
         jobs, problems = fetch_all(prefs, progress=lambda n, c: console.print("  %-15s %d ofertas" % (n, c)))
@@ -223,7 +223,7 @@ def cmd_roles(args: argparse.Namespace) -> int:
     for p in PRESETS:
         t.add_row(p.label, p.title, p.level or "-", p.area)
     console.print(t)
-    console.print("Usalos en `jobbot init --roles \"Sr PM, PO\"` o en el asistente. Cualquier otro texto se busca tal cual.")
+    console.print("Usalos en `path-finder init --roles \"Sr PM, PO\"` o en el asistente. Cualquier otro texto se busca tal cual.")
     return 0
 
 
@@ -234,7 +234,7 @@ def cmd_areas(args: argparse.Namespace) -> int:
     for a in areas_mod.load_areas().values():
         t.add_row(a.id, a.label, str(len(a.skills)), ", ".join(r.title for r in a.roles)[:70])
     console.print(t)
-    console.print("Sumá o pisá áreas con archivos YAML en %s (mismo formato que jobbot/areas/*.yaml)." % (config.home_dir() / "areas"))
+    console.print("Sumá o pisá áreas con archivos YAML en %s (mismo formato que path_finder/areas/*.yaml)." % (config.home_dir() / "areas"))
     return 0
 
 
@@ -252,7 +252,7 @@ def cmd_sources(args: argparse.Namespace) -> int:
 
 # --- parser -----------------------------------------------------------------------------------
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="jobbot", description="Buscá ofertas de trabajo y ordenalas según tu CV (reglas locales, sin IA).")
+    p = argparse.ArgumentParser(prog="path-finder", description="Buscá ofertas de trabajo y ordenalas según tu CV (reglas locales, sin IA).")
     sub = p.add_subparsers(dest="command", required=True)
 
     i = sub.add_parser("init", help="Cargar tu CV y tus preferencias (primer paso)")
