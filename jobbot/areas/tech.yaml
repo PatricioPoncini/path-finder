@@ -1,0 +1,359 @@
+# Paquete de área: Tecnología. Ver README ("Áreas") para el significado de cada clave.
+# skills: nombre canónico -> alias | concepts: skills que no entran al stack principal |
+# ambiguous: solo coinciden con esa capitalización | roles: catálogo para detectar y buscar
+id: tech
+label: Tecnología / Desarrollo
+skills:
+  Go:
+  - Golang
+  Kotlin: []
+  Java: []
+  TypeScript: []
+  JavaScript:
+  - ECMAScript
+  Python: []
+  Rust: []
+  C++: []
+  C#: []
+  PHP: []
+  Ruby: []
+  Scala: []
+  Swift: []
+  Elixir: []
+  Erlang: []
+  Haskell: []
+  Clojure: []
+  Dart: []
+  Lua: []
+  Perl: []
+  Bash:
+  - Shell scripting
+  SQL: []
+  Node.js:
+  - NodeJS
+  - Node
+  Express:
+  - Express.js
+  - ExpressJS
+  NestJS:
+  - Nest.js
+  Spring Boot:
+  - SpringBoot
+  Spring: []
+  Ktor: []
+  Micronaut: []
+  Quarkus: []
+  Django: []
+  Flask: []
+  FastAPI: []
+  Ruby on Rails:
+  - Rails
+  Laravel: []
+  .NET:
+  - dotnet
+  - ASP.NET
+  Gin: []
+  Fiber: []
+  Echo: []
+  Actix: []
+  Axum: []
+  Tokio: []
+  Phoenix: []
+  React:
+  - React.js
+  - ReactJS
+  Next.js:
+  - NextJS
+  Vue:
+  - Vue.js
+  - VueJS
+  Angular: []
+  Svelte: []
+  Redux: []
+  Tailwind:
+  - Tailwind CSS
+  HTML: []
+  CSS: []
+  React Native: []
+  Flutter: []
+  Android: []
+  iOS: []
+  Jetpack Compose: []
+  PostgreSQL:
+  - Postgres
+  MySQL: []
+  MariaDB: []
+  MongoDB:
+  - Mongo
+  Redis: []
+  DynamoDB: []
+  Cassandra: []
+  Elasticsearch:
+  - OpenSearch
+  SQLite: []
+  Oracle: []
+  SQL Server:
+  - MSSQL
+  Neo4j: []
+  ClickHouse: []
+  Snowflake: []
+  BigQuery: []
+  Redshift: []
+  Kafka:
+  - Apache Kafka
+  RabbitMQ: []
+  SQS: []
+  SNS: []
+  Pub/Sub: []
+  Airflow:
+  - Apache Airflow
+  Spark:
+  - Apache Spark
+  - PySpark
+  dbt: []
+  Pandas: []
+  GraphQL: []
+  gRPC: []
+  REST:
+  - RESTful
+  WebSocket:
+  - WebSockets
+  Protobuf: []
+  AWS:
+  - Amazon Web Services
+  GCP:
+  - Google Cloud
+  Azure: []
+  Lambda:
+  - AWS Lambda
+  API Gateway: []
+  S3: []
+  EC2: []
+  ECS: []
+  EKS: []
+  Fargate: []
+  CloudFormation: []
+  CDK:
+  - AWS CDK
+  Serverless:
+  - Serverless Framework
+  Step Functions: []
+  Docker: []
+  Kubernetes:
+  - K8s
+  Terraform: []
+  Ansible: []
+  Helm: []
+  Pulumi: []
+  Linux: []
+  Nginx: []
+  Cloudflare: []
+  CI/CD:
+  - CICD
+  GitHub Actions: []
+  GitLab CI: []
+  Jenkins: []
+  CircleCI: []
+  ArgoCD: []
+  Git: []
+  Prometheus: []
+  Grafana: []
+  Datadog: []
+  New Relic: []
+  OpenTelemetry: []
+  Sentry: []
+  ELK: []
+  Microservices:
+  - Microservicios
+  - Microservice
+  Event-driven:
+  - Event Driven
+  - EDA
+  DDD:
+  - Domain-Driven Design
+  TDD: []
+  Clean Architecture: []
+  Hexagonal Architecture: []
+  CQRS: []
+  Agile: []
+  Scrum: []
+  Kanban: []
+  OAuth:
+  - OAuth2
+  - OIDC
+  JWT: []
+  Machine Learning: []
+  TensorFlow: []
+  PyTorch: []
+  LLM:
+  - LLMs
+  OpenAI: []
+  Blockchain: []
+  Solidity: []
+  Selenium: []
+  Cypress: []
+  Jest: []
+  JUnit: []
+  Playwright: []
+  Postman: []
+  Jira: []
+  Figma: []
+concepts:
+- Scrum
+- Kanban
+- Agile
+- CI/CD
+- CQRS
+- CSS
+- Clean Architecture
+- DDD
+- Event-driven
+- Figma
+- Git
+- HTML
+- Hexagonal Architecture
+- JWT
+- Jira
+- Linux
+- Microservices
+- OAuth
+- Postman
+- REST
+- SQL
+- Serverless
+- TDD
+- WebSocket
+ambiguous:
+- Android
+- Echo
+- Express
+- Fiber
+- Gin
+- Go
+- Node
+- Oracle
+- Phoenix
+- REST
+- Spring
+- iOS
+roles:
+- title: Software Engineer
+  aliases:
+  - Software Developer
+  - SWE
+  - Desarrollador de Software
+  - Ingeniero de Software
+  - Programador
+  patterns:
+  - software (engineer|developer)
+  - ingenier[oa] de software
+  - desarrollador(a)? de software
+- title: Backend Engineer
+  aliases:
+  - Backend Developer
+  - Desarrollador Backend
+  - Ingeniero Backend
+  patterns:
+  - back[- ]?end (engineer|developer)
+  - desarrollador(a)? back[- ]?end
+  - ingenier[oa] back[- ]?end
+- title: Frontend Engineer
+  aliases:
+  - Frontend Developer
+  - Desarrollador Frontend
+  patterns:
+  - front[- ]?end (engineer|developer)
+  - desarrollador(a)? front[- ]?end
+- title: Full Stack Engineer
+  aliases:
+  - Full Stack Developer
+  - Fullstack Developer
+  - Desarrollador Full Stack
+  patterns:
+  - full[- ]?stack (engineer|developer)
+  - desarrollador(a)? full[- ]?stack
+- title: Mobile Engineer
+  aliases:
+  - Mobile Developer
+  - Android Developer
+  - iOS Developer
+  patterns:
+  - (mobile|android|ios) (engineer|developer)
+  - desarrollador(a)? (mobile|android|ios)
+- title: DevOps Engineer
+  aliases:
+  - DevOps
+  - Ingeniero DevOps
+  patterns:
+  - devops( engineer)?
+  - ingenier[oa] devops
+- title: Site Reliability Engineer
+  aliases:
+  - SRE
+  patterns:
+  - site reliability
+  - \bSRE\b
+- title: Cloud Engineer
+  aliases:
+  - Cloud Architect
+  patterns:
+  - cloud (engineer|architect)
+- title: Platform Engineer
+  aliases: []
+  patterns:
+  - platform engineer
+- title: QA Engineer
+  aliases:
+  - QA Analyst
+  - Test Automation Engineer
+  - SDET
+  patterns:
+  - \bQA\b
+  - quality assurance
+  - test automation
+- title: Tech Lead
+  aliases:
+  - TL
+  - Technical Lead
+  - Team Lead
+  - Líder Técnico
+  patterns:
+  - tech(nical)? lead
+  - team lead
+  - l[ií]der t[eé]cnico
+- title: Engineering Manager
+  aliases:
+  - Gerente de Ingeniería
+  patterns:
+  - engineering manager
+title_nouns:
+- engineer
+- developer
+- programmer
+- software
+- architect
+- devops
+- desarrollador
+- desarrolladora
+- ingeniero
+- ingeniera
+- programador
+- programadora
+feeds:
+  weworkremotely:
+  - remote-programming-jobs
+  - remote-back-end-programming-jobs
+  - remote-full-stack-programming-jobs
+  - remote-front-end-programming-jobs
+  - remote-devops-sysadmin-jobs
+  getonbrd:
+  - programming
+  - mobile-developer
+  - sysadmin-devops-qa
+  remoteok_tags: []
+weights:
+  primary: 9
+  other: 3
+  preferred: 4
+  title: 10
+  seniority: 8

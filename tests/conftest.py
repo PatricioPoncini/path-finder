@@ -20,7 +20,7 @@ def prefs() -> Preferences:
         target_roles=["Senior Software Engineer", "Backend Engineer"], seniority=["mid", "senior"],
         work_modes=["remote"], candidate_country="Argentina",
         eligible_regions=["worldwide", "anywhere", "argentina", "latam", "americas"],
-        preferred_stack=["Go"], batch_size=2, max_age_days=30,
+        preferred_stack=["Go"], max_age_days=30,
     )
 
 
@@ -33,22 +33,3 @@ def make_job(i: int = 1, **kw) -> Job:
     base.update(kw)
     return Job(**base)
 
-
-class FakeClaude:
-    """Imita Claude.tool_call: puntúa cada oferta del lote con un score fijo por id."""
-
-    def __init__(self, scores=None, drop_first=False):
-        self.scores = scores or {}
-        self.calls = 0
-        self.drop_first = drop_first
-
-    def tool_call(self, system, user, tool, max_tokens=4096):
-        self.calls += 1
-        n = user.count("### JOB ")
-        ids = list(range(1, n + 1))
-        if self.drop_first and self.calls == 1:
-            ids = ids[1:]  # simula una respuesta incompleta
-        return {"matches": [
-            {"id": str(i), "score": self.scores.get(i, 80), "eligible": "yes", "seniority_fit": "good",
-             "summary": "ok", "reasons": ["r"], "gaps": []} for i in ids
-        ]}

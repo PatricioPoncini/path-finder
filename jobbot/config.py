@@ -4,8 +4,6 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Optional
-
 import yaml
 
 from .models import Preferences, Profile
@@ -74,13 +72,7 @@ def save_prefs(prefs: Preferences) -> None:
     prefs_path().write_text(PREFS_HEADER + body, encoding="utf-8")
 
 
-def load_prefs(model_override: Optional[str] = None) -> Preferences:
+def load_prefs() -> Preferences:
     if not prefs_path().is_file():
         raise SetupError("No hay preferencias todavía. Corré primero: jobbot init")
-    prefs = Preferences.from_dict(yaml.safe_load(prefs_path().read_text(encoding="utf-8")) or {})
-    env_model = os.environ.get("JOBBOT_MODEL")
-    if model_override:
-        prefs.model = model_override
-    elif env_model:
-        prefs.model = env_model
-    return prefs
+    return Preferences.from_dict(yaml.safe_load(prefs_path().read_text(encoding="utf-8")) or {})

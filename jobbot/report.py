@@ -15,6 +15,10 @@ FIT_LABEL = {"below": "más junior de lo que buscás", "good": "seniority adecua
              "above": "pide más seniority", "unclear": "seniority no claro"}
 
 
+FOOTER = ("Score calculado con reglas locales (sin IA) a partir de tu CV y tus preferencias: sirve para priorizar. "
+          "Verificá siempre la elegibilidad regional antes de postular.")
+
+
 @dataclass
 class Entry:
     job: Job
@@ -48,10 +52,11 @@ def build_entries(
 def _header_lines(profile: Profile, prefs: Preferences, entries: List[Entry], stats: Dict[str, int]) -> List[str]:
     return [
         "Perfil: %s — %s" % (profile.name or "(sin nombre)", profile.headline),
-        "Busca: %s | %s | modalidad: %s | país: %s" % (
-            ", ".join(prefs.target_roles), "/".join(prefs.seniority),
-            ", ".join(prefs.work_modes), prefs.candidate_country or "n/a"),
-        "Ofertas en el reporte: %d (score mínimo %d). Analizadas esta corrida: %d; descartadas por filtros: %d."
+        "Busca: %s | %s | áreas: %s | modalidad: %s | país: %s | idioma de la oferta: %s" % (
+            ", ".join(prefs.target_roles), "/".join(prefs.seniority), ", ".join(prefs.areas or profile.areas) or "tech",
+            ", ".join(prefs.work_modes), prefs.candidate_country or "n/a",
+            ", ".join(prefs.job_languages) or "cualquiera"),
+        "Ofertas en el reporte: %d (score mínimo %d). Analizadas: %d; descartadas por filtros: %d."
         % (len(entries), prefs.min_score, stats.get("scored", 0), stats.get("filtered_out", 0)),
     ]
 
@@ -65,8 +70,7 @@ def render_markdown(profile: Profile, prefs: Preferences, entries: List[Entry], 
         j, m = e.job, e.match
         lines.append("## %d. %s — %s%s" % (i, j.title, j.company or "n/a", "  🆕" if e.is_new else ""))
         lines.append("**Score: %d/100** · %s · %s%s" % (
-            m.score, ELIGIBLE_LABEL.get(m.eligible, m.eligible), FIT_LABEL.get(m.seniority_fit, ""),
-            " · _(heurística, sin Claude)_" if m.method == "heuristic" else ""))
+            m.score, ELIGIBLE_LABEL.get(m.eligible, m.eligible), FIT_LABEL.get(m.seniority_fit, ""), ""))
         meta = [x for x in (j.location, j.salary, j.posted_at[:10]) if x]
         if meta:
             lines.append("📍 " + " · ".join(meta))
@@ -77,7 +81,7 @@ def render_markdown(profile: Profile, prefs: Preferences, entries: List[Entry], 
             lines += ["**A tener en cuenta:**"] + ["- " + g for g in m.gaps] + [""]
         lines.append("[Ver oferta](%s) · Fuente: %s · `ID: %s`" % (j.url, attribution(j.source), j.id))
         lines.append("")
-    lines += ["---", "Marcá el estado con `jobbot mark applied|saved|discarded <ID>`."]
+    lines += ["---", FOOTER, "Marcá el estado con `jobbot mark applied|saved|discarded <ID>`."]
     return "\n".join(lines) + "\n"
 
 
@@ -115,8 +119,7 @@ def render_html(profile: Profile, prefs: Preferences, entries: List[Entry], stat
             i, esc(j.url, quote=True), esc(j.title), esc(j.company or "n/a"),
             "<span class='new'>nueva</span>" if e.is_new else ""))
         parts.append("<div><span class='score %s'>%d/100</span> · %s · %s%s</div>" % (
-            cls, m.score, esc(ELIGIBLE_LABEL.get(m.eligible, m.eligible)), esc(FIT_LABEL.get(m.seniority_fit, "")),
-            " · <em>heurística, sin Claude</em>" if m.method == "heuristic" else ""))
+            cls, m.score, esc(ELIGIBLE_LABEL.get(m.eligible, m.eligible)), esc(FIT_LABEL.get(m.seniority_fit, "")), ""))
         if meta:
             parts.append("<div class='meta'>%s</div>" % meta)
         parts.append("<p>%s</p>" % esc(m.summary))
@@ -126,7 +129,7 @@ def render_html(profile: Profile, prefs: Preferences, entries: List[Entry], stat
             parts.append("<strong>A tener en cuenta</strong><ul>%s</ul>" % "".join("<li>%s</li>" % esc(g) for g in m.gaps))
         parts.append("<div class='src'>Fuente: %s · <code>%s</code></div></section>" % (
             esc(attribution(j.source)), esc(j.id)))
-    parts.append("</main></body></html>")
+    parts.append("<p class='meta'>%s</p></main></body></html>" % esc(FOOTER))
     return "\n".join(parts)
 
 

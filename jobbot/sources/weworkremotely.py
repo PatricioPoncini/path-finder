@@ -6,16 +6,23 @@ from datetime import timezone
 from email.utils import parsedate_to_datetime
 from typing import Dict, List
 
+from .. import areas as areas_mod
 from ..models import Job, Preferences, html_to_text, stable_hash
 from .base import Source
 
-FEEDS = [
-    "https://weworkremotely.com/remote-jobs.rss",
-    "https://weworkremotely.com/categories/remote-programming-jobs.rss",
-    "https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss",
-    "https://weworkremotely.com/categories/remote-full-stack-programming-jobs.rss",
-    "https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss",
-]
+GENERAL_FEED = "https://weworkremotely.com/remote-jobs.rss"
+CATEGORY_URL = "https://weworkremotely.com/categories/%s.rss"
+
+
+def feeds_for(prefs: Preferences) -> List[str]:
+    """Feed general + las categorías de las áreas activas (ver `feeds.weworkremotely` en cada paquete de área)."""
+    urls = [GENERAL_FEED]
+    for area in areas_mod.resolve(prefs.areas):
+        for slug in area.feeds.get("weworkremotely", []):
+            url = CATEGORY_URL % slug
+            if url not in urls:
+                urls.append(url)
+    return urls
 WORLDWIDE = ("anywhere", "worldwide", "global")
 
 
@@ -31,7 +38,7 @@ class WeWorkRemotely(Source):
 
     def fetch(self, prefs: Preferences, client) -> List[Job]:
         jobs: Dict[str, Job] = {}
-        for url in FEEDS:
+        for url in feeds_for(prefs):
             resp = client.get(url)
             resp.raise_for_status()
             for job in self.parse_feed(resp.text):

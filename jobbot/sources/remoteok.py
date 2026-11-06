@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import List
 
+from .. import areas as areas_mod
 from ..models import Job, Preferences, html_to_text
 from .base import Source
 
@@ -14,10 +15,17 @@ class RemoteOK(Source):
     URL = "https://remoteok.com/api"
 
     def fetch(self, prefs: Preferences, client) -> List[Job]:
-        resp = client.get(self.URL)
-        resp.raise_for_status()
-        # El primer elemento es el aviso legal, no una oferta
-        return [self._parse(i) for i in resp.json() if isinstance(i, dict) and i.get("id")]
+        jobs = {}
+        tags = [None] + [t for a in areas_mod.resolve(prefs.areas) for t in a.feeds.get("remoteok_tags", [])]
+        for tag in dict.fromkeys(tags):  # feed general + una consulta por tag de las áreas activas
+            resp = client.get(self.URL, params={"tag": tag} if tag else None)
+            resp.raise_for_status()
+            # El primer elemento es el aviso legal, no una oferta
+            for i in resp.json():
+                if isinstance(i, dict) and i.get("id"):
+                    job = self._parse(i)
+                    jobs.setdefault(job.id, job)
+        return list(jobs.values())
 
     @staticmethod
     def _parse(item: dict) -> Job:

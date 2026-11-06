@@ -89,14 +89,12 @@ def test_preferences_from_profile_and_wizard():
     assert prefs.work_modes == ["remote", "hybrid"] and "latam" in prefs.eligible_regions  # regiones recalculadas
 
 
-def test_prefs_roundtrip_and_cache_fingerprint(tmp_path, monkeypatch):
+def test_prefs_roundtrip_and_old_fields_ignored(tmp_path, monkeypatch):
     monkeypatch.setenv("JOBBOT_HOME", str(tmp_path))
-    prefs = Preferences(target_roles=["Data Analyst"], notes="solo startups")
+    prefs = Preferences(target_roles=["Data Analyst"], preferred_stack=["SQL"])
     config.save_prefs(prefs)
     loaded = config.load_prefs()
-    assert loaded.target_roles == ["Data Analyst"] and loaded.notes == "solo startups"
-    other = Preferences(target_roles=["Data Analyst"], notes="otra cosa")
-    assert loaded.scoring_fingerprint() != other.scoring_fingerprint()
-    # campos que no afectan el scoring no invalidan la caché
-    loaded.min_score = 99
-    assert loaded.scoring_fingerprint() == prefs.scoring_fingerprint()
+    assert loaded.target_roles == ["Data Analyst"] and loaded.preferred_stack == ["SQL"]
+    # un preferences.yaml de la versión con Claude (model, notes...) sigue cargando
+    config.prefs_path().write_text("target_roles: [QA]\nmodel: claude-haiku-5-5\nnotes: x\n", encoding="utf-8")
+    assert config.load_prefs().target_roles == ["QA"]

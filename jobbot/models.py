@@ -45,6 +45,7 @@ class Job:
     tags: List[str] = field(default_factory=list)
     posted_at: str = ""  # ISO 8601 UTC
     salary: str = ""
+    language: str = ""  # idioma declarado por la fuente (es, en...), si lo da
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -64,7 +65,6 @@ class Match:
     summary: str = ""
     reasons: List[str] = field(default_factory=list)
     gaps: List[str] = field(default_factory=list)
-    method: str = "claude"  # claude | heuristic
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -92,6 +92,8 @@ class Profile:
     languages: List[Dict[str, str]] = field(default_factory=list)
     education: List[str] = field(default_factory=list)
     roles_suited: List[str] = field(default_factory=list)
+    areas: List[str] = field(default_factory=list)  # áreas detectadas (tech, product, design, data...)
+    suggested_terms: List[str] = field(default_factory=list)  # términos frecuentes del CV fuera del vocabulario
     linkedin_url: str = ""
     cv_hash: str = ""
 
@@ -102,11 +104,6 @@ class Profile:
     def from_dict(cls, data: Dict[str, Any]) -> "Profile":
         names = {f.name for f in fields(cls)}
         return cls(**{k: v for k, v in data.items() if k in names})
-
-    def fingerprint(self) -> str:
-        d = self.to_dict()
-        d.pop("cv_hash", None)
-        return stable_hash(d)
 
 
 @dataclass
@@ -122,22 +119,20 @@ class Preferences:
         default_factory=lambda: ["worldwide", "anywhere", "global", "remote"]
     )
     strict_region_filter: bool = True
+    # Idiomas aceptados en la descripción de la oferta (códigos: es, en, pt, it, de, fr). Vacío = cualquiera
+    job_languages: List[str] = field(default_factory=list)
+    areas: List[str] = field(default_factory=list)  # vacío = las del perfil (o tech)
+    must_have: List[str] = field(default_factory=list)  # imprescindibles: términos que la oferta debería mencionar
     preferred_stack: List[str] = field(default_factory=list)
     avoid_stack: List[str] = field(default_factory=list)
     exclude_keywords: List[str] = field(default_factory=list)  # en título/tags
     title_keywords: List[str] = field(default_factory=list)  # frases extra aceptadas en el título
     search_queries: List[str] = field(default_factory=list)  # si vacío se derivan de target_roles
-    languages_ok: List[str] = field(default_factory=list)
     min_salary_usd: int = 0
-    notes: str = ""  # texto libre que se le pasa a Claude
-    output_language: str = "Spanish"
     max_age_days: int = 30
-    min_score: int = 60
-    max_jobs_per_run: int = 60
-    batch_size: int = 5
-    model: str = "claude-haiku-5-5"
+    min_score: int = 40
     sources: List[str] = field(
-        default_factory=lambda: ["remotive", "remoteok", "himalayas", "weworkremotely", "arbeitnow"]
+        default_factory=lambda: ["remotive", "remoteok", "himalayas", "weworkremotely", "arbeitnow", "getonbrd"]
     )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -147,12 +142,3 @@ class Preferences:
     def from_dict(cls, data: Dict[str, Any]) -> "Preferences":
         names = {f.name for f in fields(cls)}
         return cls(**{k: v for k, v in (data or {}).items() if k in names and v is not None})
-
-    def scoring_fingerprint(self) -> str:
-        """Hash solo de lo que cambia el resultado del scoring (invalida la caché al editarlo)."""
-        keys = [
-            "target_roles", "seniority", "work_modes", "candidate_country", "preferred_stack",
-            "avoid_stack", "languages_ok", "min_salary_usd", "notes", "output_language",
-        ]
-        d = self.to_dict()
-        return stable_hash({k: d[k] for k in keys})

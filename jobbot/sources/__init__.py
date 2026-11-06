@@ -7,14 +7,24 @@ from ..models import Job, Preferences
 from .adzuna import Adzuna
 from .arbeitnow import Arbeitnow
 from .base import Source, make_client
+from .getonbrd import GetOnBoard
 from .himalayas import Himalayas
 from .remoteok import RemoteOK
 from .remotive import Remotive
 from .weworkremotely import WeWorkRemotely
 
 SOURCES: Dict[str, Source] = {
-    s.name: s for s in (Remotive(), RemoteOK(), Himalayas(), WeWorkRemotely(), Arbeitnow(), Adzuna())
+    s.name: s for s in (Remotive(), RemoteOK(), Himalayas(), WeWorkRemotely(), Arbeitnow(), GetOnBoard(), Adzuna())
 }
+
+
+def active_sources(prefs: Preferences) -> List[str]:
+    """Fuentes elegidas por el usuario + las que su idioma de ofertas activa solas (ej. español -> Get on Board)."""
+    names = list(prefs.sources)
+    for name, source in SOURCES.items():
+        if name not in names and any(lang in prefs.job_languages for lang in source.auto_languages):
+            names.append(name)
+    return names
 
 
 def fetch_all(prefs: Preferences, progress=None) -> Tuple[List[Job], Dict[str, str]]:
@@ -25,7 +35,7 @@ def fetch_all(prefs: Preferences, progress=None) -> Tuple[List[Job], Dict[str, s
     jobs: List[Job] = []
     problems: Dict[str, str] = {}
     with make_client() as client:
-        for name in prefs.sources:
+        for name in active_sources(prefs):
             source = SOURCES.get(name)
             if source is None:
                 problems[name] = "fuente desconocida (válidas: %s)" % ", ".join(SOURCES)

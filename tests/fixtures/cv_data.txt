@@ -1,0 +1,13 @@
+SOFIA MENDEZ
+Data Scientist
+Montevideo, Uruguay | sofia@example.com
+
+EXPERIENCIA
+Retail Analytics - Senior Data Scientist                      2020 - Presente
+Modelos de forecasting y regresión en Python (pandas, scikit-learn) y SQL sobre BigQuery y Snowflake. Pipelines ETL con Airflow y
+dbt, dashboards en Tableau y Looker. Diseño de experimentos y A/B testing. Machine Learning en producción con MLflow y Docker.
+Banco del Sur - Data Analyst                                  2017 - 2020
+Análisis de datos con SQL y Excel, visualización de datos en Power BI, calidad de datos y gobierno de datos.
+
+EDUCACIÓN
+Universidad de la República - Licenciatura en Estadística     2011 - 2016

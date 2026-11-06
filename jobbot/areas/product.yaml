@@ -1,0 +1,76 @@
+# Paquete de área: Producto (PM, PO, Head of Product...). Ver README ("Áreas").
+id: product
+label: Producto
+skills:
+  Roadmapping: [roadmap, roadmaps, product roadmap]
+  Product Discovery: [discovery, customer discovery, continuous discovery]
+  Product Strategy: [product vision, estrategia de producto]
+  Backlog Management: [backlog, backlog grooming, backlog refinement]
+  User Stories: [user story, historias de usuario]
+  Prioritization: [priorización, RICE, MoSCoW]
+  OKRs: [OKR]
+  KPIs: [KPI, product metrics, métricas de producto]
+  A/B Testing: [AB testing, A/B test, split testing, experimentation, experimentación]
+  Product Analytics: [analítica de producto]
+  Amplitude: []
+  Mixpanel: []
+  Google Analytics: [GA4]
+  Looker: []
+  Tableau: []
+  SQL: []
+  Jira: []
+  Confluence: []
+  Notion: []
+  Productboard: []
+  Aha!: []
+  Linear: []
+  Asana: []
+  Trello: []
+  Figma: []
+  Miro: []
+  Stakeholder Management: [stakeholders, gestión de stakeholders]
+  User Research: [user interviews, customer interviews, entrevistas a usuarios, investigación de usuarios]
+  Go-to-Market: [GTM, go to market]
+  Pricing: [pricing strategy]
+  Monetization: [monetización]
+  Growth Hacking: [product-led growth, PLG]
+  Agile: [Agile methodologies, metodologías ágiles]
+  Scrum: [Scrum Master]
+  Kanban: []
+  SAFe: [Scaled Agile]
+  Lean: [Lean Startup]
+  Design Thinking: []
+  Customer Journey: [user journey, journey mapping]
+  MVP: [minimum viable product]
+  B2B: []
+  B2C: []
+  SaaS: []
+  Marketplace: []
+  Fintech: []
+  E-commerce: [ecommerce]
+  Platform Product: [platform product management]
+  API Products: [API product]
+concepts: [Agile, Scrum, Kanban, SAFe, Lean, OKRs, KPIs, Prioritization, User Stories, Backlog Management, Stakeholder Management,
+  Design Thinking, Customer Journey, MVP, Jira, Confluence, Notion, Asana, Trello, Miro, Figma]
+ambiguous: [Linear, Notion, Lean, Pricing, Marketplace]
+roles:
+  - title: Product Manager
+    aliases: [PM, Gerente de Producto, Product Lead, Senior Product Manager, Technical Product Manager, TPM, Group Product Manager, GPM]
+    patterns: ['product manager', 'product management', 'gerente de producto', 'responsable de producto']
+  - title: Product Owner
+    aliases: [PO, Dueño de Producto, Duena de Producto, Product Owner]
+    patterns: ['product owner', 'due[ñn]o de producto', 'due[ñn]a de producto']
+  - title: Head of Product
+    aliases: [Director of Product, VP of Product, VP Product, Chief Product Officer, CPO, Director de Producto]
+    patterns: ['head of product', 'director of product', 'vp of product', 'chief product officer', 'director de producto']
+  - title: Product Operations
+    aliases: [Product Ops, Product Operations Manager]
+    patterns: ['product operations', 'product ops']
+# Sustantivos que, junto a un término conocido en el título ("Fintech Product Lead"), lo vuelven candidato.
+# Se evita "manager"/"lead" a secas: traerían "Sales Manager" o "Customer Success Manager".
+title_nouns: [product, producto, owner]
+feeds:
+  weworkremotely: [remote-product-jobs]
+  getonbrd: [innovation-agile]
+  remoteok_tags: [product-manager]
+weights: {primary: 6, other: 2, preferred: 4, title: 20, seniority: 8}

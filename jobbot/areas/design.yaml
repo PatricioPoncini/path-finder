@@ -1,0 +1,68 @@
+# Paquete de área: Diseño (UX/UI, producto, investigación). Ver README ("Áreas").
+id: design
+label: Diseño
+skills:
+  Figma: []
+  FigJam: []
+  Sketch: []
+  Adobe XD: [XD]
+  Photoshop: [Adobe Photoshop]
+  Illustrator: [Adobe Illustrator]
+  After Effects: []
+  InVision: []
+  Framer: []
+  Principle: []
+  Zeplin: []
+  Storybook: []
+  Webflow: []
+  Miro: []
+  Maze: []
+  Hotjar: []
+  Lottie: []
+  Blender: []
+  Design Systems: [design system, sistema de diseño]
+  Prototyping: [prototype, prototypes, prototipado, prototipos]
+  Wireframing: [wireframes, wireframe]
+  User Research: [user interviews, investigación de usuarios, UX research]
+  Usability Testing: [user testing, usability test, pruebas de usabilidad]
+  UX Writing: [content design, microcopy]
+  Information Architecture: [arquitectura de información]
+  Interaction Design: [IxD]
+  Visual Design: [diseño visual]
+  Motion Design: [motion graphics, animación]
+  Accessibility: [WCAG, a11y, accesibilidad]
+  Responsive Design: [diseño responsive]
+  Mobile Design: [diseño mobile]
+  Design Thinking: []
+  Branding: [brand identity, identidad de marca]
+  Typography: [tipografía]
+  Customer Journey: [user journey, journey mapping]
+  Personas: [user personas]
+  HTML: []
+  CSS: []
+  A/B Testing: [AB testing]
+concepts: [Design Thinking, Personas, Customer Journey, Typography, Branding, Responsive Design, Mobile Design, Accessibility,
+  Visual Design, HTML, CSS, Miro, A/B Testing]
+ambiguous: [Principle, Maze, Framer, Sketch]
+roles:
+  - title: UX/UI Designer
+    aliases: [UX Designer, UI Designer, UX/UI, Diseñador UX, Diseñadora UX, Diseñador UI, Diseñador UX/UI, Interaction Designer]
+    patterns: ['ux/?ui designer', 'ux designer', 'ui designer', 'dise[ñn]ador(a)? ux', 'dise[ñn]ador(a)? ui', 'interaction designer']
+  - title: Product Designer
+    aliases: [Diseñador de Producto, Diseñadora de Producto]
+    patterns: ['product designer', 'dise[ñn]ador(a)? de producto']
+  - title: Visual Designer
+    aliases: [Graphic Designer, Brand Designer, Diseñador Gráfico, Diseñadora Gráfica]
+    patterns: ['visual designer', 'graphic designer', 'brand designer', 'dise[ñn]ador(a)? gr[aá]fic[oa]']
+  - title: UX Researcher
+    aliases: [User Researcher, Investigador UX, Investigadora UX]
+    patterns: ['ux research(er)?', 'user research(er)?']
+  - title: Head of Design
+    aliases: [Design Lead, Design Manager, Director of Design, VP of Design]
+    patterns: ['head of design', 'design lead', 'design manager', 'director of design']
+title_nouns: [designer, researcher, design, ux, ui, diseñador, diseñadora, diseño]
+feeds:
+  weworkremotely: [remote-design-jobs]
+  getonbrd: [design-ux]
+  remoteok_tags: [designer]
+weights: {primary: 6, other: 2, preferred: 4, title: 20, seniority: 8}

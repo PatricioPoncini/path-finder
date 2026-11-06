@@ -1,0 +1,14 @@
+MARTIN ROJAS
+Product Designer
+Córdoba, Argentina | martin@example.com
+
+EXPERIENCIA
+Studio Norte - Senior Product Designer                        Feb 2020 - Presente
+Diseño de producto end-to-end para apps B2C: investigación de usuarios, wireframes, prototipos en Figma, design systems con
+Storybook y pruebas de usabilidad. Accesibilidad WCAG, UX writing y responsive design. Colaboración diaria con ingeniería.
+Agencia Pixel - UX/UI Designer                                2017 - 2020
+Diseño visual y de interacción para web y mobile, branding y tipografía. Herramientas: Sketch, Adobe XD, Photoshop, Illustrator.
+Participé en design thinking workshops y user journey mapping.
+
+EDUCACIÓN
+Universidad Nacional de Córdoba - Diseño Gráfico              2012 - 2016

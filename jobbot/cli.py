@@ -1,4 +1,4 @@
-"""Interfaz de línea de comandos: init | profile | prefs | search | history | mark | sources."""
+"""Interfaz de línea de comandos: init | profile | prefs | search | history | mark | sources (sin IA)."""
 from __future__ import annotations
 
 import argparse
@@ -11,26 +11,30 @@ from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table
 
+from . import areas as areas_mod
 from . import config
-from .claude import DEFAULT_MODEL, Claude, ClaudeError
 from .config import SetupError
 from .filters import apply_filters, parse_date
-from .matcher import estimate_tokens, build_system, heuristic_match, score_jobs
-from .prefs import normalize_seniority, preferences_from_profile, run_wizard, split_list
+from .prefs import normalize_seniority, preferences_from_profile, review_profile, run_wizard, split_list
 from .profile import extract_profile
+from .ranking import rank_job, rank_jobs
 from .report import build_entries, write_reports
-from .sources import SOURCES, fetch_all
+from .roles import LEVEL_INDEX, PRESETS, resolve_roles
+from .sources import SOURCES, active_sources, fetch_all
 from .store import STATUSES, Store
 
 console = Console()
 
 
+def resolve_with_flags(text: str):
+    """--roles "Sr PM, PO" -> (títulos, niveles explícitos, áreas, ¿algún rol sin nivel?)."""
+    tokens = split_list(text)
+    titles, levels, found_areas = resolve_roles(tokens)
+    return titles, levels, found_areas, any(not resolve_roles([t])[1] for t in tokens)
+
+
 def _ask(question: str, default: str) -> str:
     return Prompt.ask(question, default=default, show_default=bool(default), console=console)
-
-
-def _score_key(profile, prefs) -> str:
-    return "%s:%s" % (profile.fingerprint(), prefs.scoring_fingerprint())
 
 
 # --- init -------------------------------------------------------------------------------------
@@ -43,33 +47,44 @@ def cmd_init(args: argparse.Namespace) -> int:
         linkedin = args.linkedin if args.linkedin is not None else (
             "" if args.yes else Prompt.ask("Tu URL de LinkedIn (opcional, solo se guarda en el perfil)",
                                            default="", show_default=False, console=console))
-        console.print("Analizando tu CV con Claude…")
+        console.print("Leyendo tu CV…")
         profile = extract_profile(
-            Claude(args.model or DEFAULT_MODEL), Path(cv), linkedin_url=linkedin,
+            Path(cv), linkedin_url=linkedin,
             extra_text_path=Path(args.extra_text) if args.extra_text else None)
+        console.print("Esto es lo que detecté (es aproximado, podés corregirlo):")
+        _show_profile(profile)
+        if not args.yes:
+            profile = review_profile(profile, _ask)
         config.save_profile(profile)
         console.print("[green]Perfil guardado[/green] en %s" % config.profile_path())
-        _show_profile(profile)
         base = preferences_from_profile(profile)
 
     # Flags explícitos pisan los defaults (útil para scripting y para --yes)
+    if args.areas:
+        known = areas_mod.load_areas()
+        base.areas = [a for a in split_list(args.areas.lower()) if a in known] or base.areas
     if args.roles:
-        base.target_roles = split_list(args.roles)
+        titles, levels, found_areas, unleveled = resolve_with_flags(args.roles)
+        base.target_roles = titles or base.target_roles
+        if levels:  # "Sr PM" fija el nivel; roles sin nivel (ej. "PO") conservan el de antes
+            base.seniority = sorted(set(levels) | (set(base.seniority) if unleveled else set()), key=lambda x: LEVEL_INDEX[x])
+        base.areas = base.areas or found_areas
     if args.seniority:
         base.seniority = normalize_seniority(split_list(args.seniority)) or base.seniority
     if args.modes:
         base.work_modes = [m for m in split_list(args.modes.lower()) if m in ("remote", "hybrid", "onsite")] or base.work_modes
+    if args.job_languages:
+        from .lang import normalize_languages
+        base.job_languages = normalize_languages(split_list(args.job_languages)) or base.job_languages
     if args.country:
         from .prefs import default_regions
         base.candidate_country = args.country
         base.eligible_regions = default_regions(args.country)
-    if args.model:
-        base.model = args.model
 
     prefs = base if args.yes else run_wizard(base, _ask, profile)
     config.save_prefs(prefs)
     console.print("[green]Preferencias guardadas[/green] en %s (podés editarlas a mano)." % config.prefs_path())
-    console.print("Siguiente paso: [bold]jobbot search[/bold]  (probá antes con --dry-run)")
+    console.print("Siguiente paso: [bold]jobbot search[/bold]  ")
     return 0
 
 
@@ -78,8 +93,10 @@ def _show_profile(profile) -> None:
     for label, value in (
         ("Nombre", profile.name), ("Título", profile.headline),
         ("País", profile.country), ("Experiencia", "%s años (%s)" % (profile.years_experience, profile.seniority_level)),
-        ("Stack principal", ", ".join(profile.primary_stack)), ("Puestos sugeridos", ", ".join(profile.roles_suited)),
-        ("Idiomas", ", ".join("%s (%s)" % (l.get("language"), l.get("level")) for l in profile.languages)),
+        ("Áreas", ", ".join(profile.areas) or "(no detectadas: se usa tech)"),
+        ("Skills principales", ", ".join(profile.primary_stack)), ("Otras skills", ", ".join(
+            s for s in profile.skills if s not in profile.primary_stack)),
+        ("Puestos sugeridos", ", ".join(profile.roles_suited)),
     ):
         t.add_row("[bold]%s[/bold]" % label, str(value))
     console.print(t)
@@ -89,8 +106,7 @@ def cmd_profile(args: argparse.Namespace) -> int:
     if args.refresh:
         old = config.load_profile() if config.profile_path().is_file() else None
         cv = args.cv or Prompt.ask("Ruta de tu CV", console=console)
-        profile = extract_profile(Claude(args.model or DEFAULT_MODEL), Path(cv),
-                                  linkedin_url=old.linkedin_url if old else "")
+        profile = extract_profile(Path(cv), linkedin_url=old.linkedin_url if old else "")
         config.save_profile(profile)
         console.print("[green]Perfil actualizado.[/green]")
     else:
@@ -103,7 +119,7 @@ def cmd_profile(args: argparse.Namespace) -> int:
 def cmd_prefs(args: argparse.Namespace) -> int:
     if args.edit:
         args.prefs_only, args.cv, args.linkedin, args.extra_text = True, None, None, None
-        args.roles = args.seniority = args.modes = args.country = None
+        args.roles = args.seniority = args.modes = args.country = args.job_languages = args.areas = None
         args.yes = False
         return cmd_init(args)
     config.load_prefs()  # valida que exista
@@ -115,12 +131,14 @@ def cmd_prefs(args: argparse.Namespace) -> int:
 # --- search -----------------------------------------------------------------------------------
 def cmd_search(args: argparse.Namespace) -> int:
     profile = config.load_profile()
-    prefs = config.load_prefs(args.model)
+    prefs = config.load_prefs()
     if args.min_score is not None:
         prefs.min_score = args.min_score
     if args.sources:
         prefs.sources = split_list(args.sources)
-    limit = args.limit or prefs.max_jobs_per_run
+    prefs.areas = prefs.areas or profile.areas  # las fuentes eligen categorías según las áreas
+    if not (profile.skills or profile.primary_stack):
+        console.print("[yellow]Tu perfil no tiene skills: el ranking será pobre. Editá %s o corré `jobbot profile --refresh`.[/yellow]" % config.profile_path())
 
     with console.status("Buscando ofertas…"):
         jobs, problems = fetch_all(prefs, progress=lambda n, c: console.print("  %-15s %d ofertas" % (n, c)))
@@ -130,6 +148,8 @@ def cmd_search(args: argparse.Namespace) -> int:
         console.print("[red]No se obtuvo ninguna oferta de las fuentes.[/red]")
         return 1
 
+    if prefs.job_languages:
+        console.print("Idioma de ofertas aceptado: %s" % ", ".join(prefs.job_languages))
     result = apply_filters(jobs, profile, prefs)
     console.print("\n%d ofertas -> %d tras filtros." % (len(jobs), len(result.kept)))
     for reason, count in result.dropped.most_common():
@@ -142,52 +162,17 @@ def cmd_search(args: argparse.Namespace) -> int:
         candidates = [j for j in result.kept if statuses.get(j.id) not in ("applied", "discarded")]
         candidates.sort(key=lambda j: parse_date(j.posted_at) or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
 
-        key = _score_key(profile, prefs)
-        matches = {}
-        if args.no_llm:
-            matches = {j.id: heuristic_match(j, profile, prefs) for j in candidates}
-            todo, failed, claude = [], [], None
-        else:
-            matches = store.get_scores((j.id for j in candidates), key)
-            pending = [j for j in candidates if j.id not in matches]
-            todo = pending[:limit]
-            console.print("%d ya puntuadas antes (caché), %d por puntuar ahora%s." % (
-                len(matches), len(todo),
-                " (%d quedan para la próxima corrida; subí --limit)" % (len(pending) - len(todo)) if len(pending) > len(todo) else ""))
-            failed, claude = [], None
-
-        if args.dry_run:
-            if todo:
-                calls, tin, tout = estimate_tokens(build_system(profile, prefs), todo, prefs.batch_size)
-                console.print("\n[bold]Dry-run[/bold]: %d llamadas a %s, ~%d tokens de entrada y ~%d de salida. "
-                              "Revisá el precio vigente de tu modelo en anthropic.com/pricing." % (calls, prefs.model, tin, tout))
-            console.print("No se llamó a Claude ni se generó reporte.")
-            return 0
-
-        if todo:
-            claude = Claude(prefs.model)
-            with console.status("Puntuando con Claude…") as status:
-                new_matches, failed = score_jobs(
-                    claude, profile, prefs, todo,
-                    on_batch=lambda done, total: status.update("Puntuando con Claude… %d/%d" % (done, total)))
-            store.save_scores(new_matches, key)
-            matches.update({m.job_id: m for m in new_matches})
-            if failed:
-                console.print("[yellow]%d ofertas no se pudieron puntuar (se reintentan la próxima vez).[/yellow]" % len(failed))
+        matches = rank_jobs(candidates, profile, prefs)
 
         entries = build_entries(candidates, matches, new_ids, prefs.min_score,
                                 show_ineligible=args.show_ineligible, only_new=args.only_new)
-        stats = {"scored": len(todo) if not args.no_llm else len(candidates), "filtered_out": sum(result.dropped.values())}
+        stats = {"scored": len(candidates), "filtered_out": sum(result.dropped.values())}
         md_path, html_path = write_reports(config.reports_dir(), profile, prefs, entries, stats)
     finally:
         store.close()
 
     _print_top(entries)
     console.print("\n[green]Reporte:[/green] %s\n         %s" % (md_path, html_path))
-    if claude:
-        u = claude.usage
-        console.print("[dim]Uso de API: %d llamadas, %d tokens in (+%d de caché), %d out[/dim]" % (
-            u.calls, u.input_tokens, u.cache_read_tokens, u.output_tokens))
     return 0
 
 
@@ -208,14 +193,14 @@ def cmd_history(args: argparse.Namespace) -> int:
     profile, prefs = config.load_profile(), config.load_prefs()
     store = Store(config.db_path())
     try:
-        rows = store.list_jobs(args.status, args.limit, _score_key(profile, prefs))
+        rows = store.list_jobs(args.status, args.limit)
     finally:
         store.close()
     t = Table()
     for col in ("Estado", "Score", "Puesto", "Empresa", "ID"):
         t.add_column(col)
-    for job, status, match in rows:
-        t.add_row(status, str(match.score) if match else "-", job.title[:48], job.company[:24], job.id)
+    for job, status in rows:
+        t.add_row(status, str(rank_job(job, profile, prefs).score), job.title[:48], job.company[:24], job.id)
     console.print(t)
     return 0
 
@@ -231,8 +216,30 @@ def cmd_mark(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_roles(args: argparse.Namespace) -> int:
+    t = Table(title="Roles comunes")
+    for col in ("Atajo", "Busca", "Nivel", "Área"):
+        t.add_column(col)
+    for p in PRESETS:
+        t.add_row(p.label, p.title, p.level or "-", p.area)
+    console.print(t)
+    console.print("Usalos en `jobbot init --roles \"Sr PM, PO\"` o en el asistente. Cualquier otro texto se busca tal cual.")
+    return 0
+
+
+def cmd_areas(args: argparse.Namespace) -> int:
+    t = Table(title="Áreas")
+    for col in ("Id", "Nombre", "Skills", "Roles"):
+        t.add_column(col)
+    for a in areas_mod.load_areas().values():
+        t.add_row(a.id, a.label, str(len(a.skills)), ", ".join(r.title for r in a.roles)[:70])
+    console.print(t)
+    console.print("Sumá o pisá áreas con archivos YAML en %s (mismo formato que jobbot/areas/*.yaml)." % (config.home_dir() / "areas"))
+    return 0
+
+
 def cmd_sources(args: argparse.Namespace) -> int:
-    enabled = config.load_prefs().sources if config.prefs_path().is_file() else []
+    enabled = active_sources(config.load_prefs()) if config.prefs_path().is_file() else []
     t = Table()
     for col in ("Fuente", "Activa", "Disponible", "Sitio"):
         t.add_column(col)
@@ -245,7 +252,7 @@ def cmd_sources(args: argparse.Namespace) -> int:
 
 # --- parser -----------------------------------------------------------------------------------
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="jobbot", description="Buscá ofertas de trabajo puntuadas contra tu CV con Claude.")
+    p = argparse.ArgumentParser(prog="jobbot", description="Buscá ofertas de trabajo y ordenalas según tu CV (reglas locales, sin IA).")
     sub = p.add_subparsers(dest="command", required=True)
 
     i = sub.add_parser("init", help="Cargar tu CV y tus preferencias (primer paso)")
@@ -253,34 +260,29 @@ def build_parser() -> argparse.ArgumentParser:
     i.add_argument("--linkedin", help="URL de LinkedIn (solo se guarda en el perfil)")
     i.add_argument("--extra-text", help="Texto extra del perfil (ej. 'Acerca de' de LinkedIn) en .txt/.md")
     i.add_argument("--prefs-only", action="store_true", help="No volver a leer el CV; solo editar preferencias")
-    i.add_argument("--roles", help="Puestos separados por coma")
-    i.add_argument("--seniority", help="junior, ssr/mid, sr/senior, lead (separados por coma)")
+    i.add_argument("--roles", help='Puestos separados por coma; acepta atajos: "Sr PM, PO, TL, Sr Software Engineer"')
+    i.add_argument("--areas", help="Áreas separadas por coma: tech, product, design, data")
+    i.add_argument("--seniority", help="junior, ssr/mid, sr/senior, lead/TL, expert/staff, head (separados por coma)")
     i.add_argument("--modes", help="remote, hybrid, onsite (separados por coma)")
     i.add_argument("--country", help="País donde vivís")
-    i.add_argument("--model", help="Modelo de Claude a usar")
+    i.add_argument("--job-languages", help="Idiomas aceptados en las ofertas, ej. es o es,en")
     i.add_argument("--yes", "-y", action="store_true", help="No preguntar: aceptar defaults y flags")
     i.set_defaults(func=cmd_init)
 
     pr = sub.add_parser("profile", help="Ver o regenerar tu perfil")
     pr.add_argument("--refresh", action="store_true", help="Volver a extraer el perfil del CV")
     pr.add_argument("--cv")
-    pr.add_argument("--model")
     pr.set_defaults(func=cmd_profile)
 
     pf = sub.add_parser("prefs", help="Ver o editar tus preferencias")
     pf.add_argument("--edit", action="store_true", help="Volver a correr el asistente de preferencias")
-    pf.add_argument("--model")
     pf.set_defaults(func=cmd_prefs)
 
-    s = sub.add_parser("search", help="Buscar, puntuar y generar el reporte")
-    s.add_argument("--limit", type=int, help="Máximo de ofertas nuevas a puntuar con Claude")
+    s = sub.add_parser("search", help="Buscar, ordenar y generar el reporte")
     s.add_argument("--min-score", type=int, help="Score mínimo para aparecer en el reporte")
-    s.add_argument("--no-llm", action="store_true", help="Sin Claude: score aproximado por coincidencia de skills")
-    s.add_argument("--dry-run", action="store_true", help="Mostrar qué se haría y el costo estimado, sin llamar a Claude")
     s.add_argument("--only-new", action="store_true", help="Reporte solo con ofertas vistas por primera vez")
     s.add_argument("--show-ineligible", action="store_true", help="Incluir ofertas donde no podés aplicar")
     s.add_argument("--sources", help="Fuentes a usar esta vez (separadas por coma)")
-    s.add_argument("--model", help="Modelo de Claude para esta corrida")
     s.set_defaults(func=cmd_search)
 
     h = sub.add_parser("history", help="Ofertas vistas y su estado")
@@ -292,6 +294,12 @@ def build_parser() -> argparse.ArgumentParser:
     m.add_argument("status", choices=STATUSES)
     m.add_argument("ids", nargs="+", help="IDs mostrados en el reporte (ej. remotive:123)")
     m.set_defaults(func=cmd_mark)
+
+    ro = sub.add_parser("roles", help="Listar roles comunes (PM, PO, TL, Sr Software Engineer...)")
+    ro.set_defaults(func=cmd_roles)
+
+    ar = sub.add_parser("areas", help="Listar áreas profesionales (tech, product, design, data...)")
+    ar.set_defaults(func=cmd_areas)
 
     so = sub.add_parser("sources", help="Listar fuentes de ofertas")
     so.set_defaults(func=cmd_sources)
@@ -306,9 +314,6 @@ def main(argv: Optional[List[str]] = None) -> int:
     except SetupError as e:
         console.print("[red]%s[/red]" % e)
         return 2
-    except ClaudeError as e:
-        console.print("[red]%s[/red]" % e)
-        return 1
     except KeyboardInterrupt:
         console.print("\nCancelado.")
         return 130

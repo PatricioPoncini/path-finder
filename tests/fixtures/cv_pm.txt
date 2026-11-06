@@ -1,0 +1,17 @@
+LAURA GOMEZ
+Senior Product Manager
+Buenos Aires, Argentina | laura@example.com
+
+EXPERIENCIA
+Fintech Pay - Senior Product Manager                          Mar 2021 - Presente
+Lideré el roadmap de producto de pagos B2B en una plataforma SaaS: discovery con entrevistas a usuarios, priorización con RICE,
+experimentación con A/B testing y métricas de producto en Amplitude y SQL. Definí OKRs trimestrales y trabajé con stakeholders
+de riesgo, legales y ventas. Backlog en Jira y Confluence; metodologías ágiles (Scrum).
+Marketplace Co - Product Owner                                2018 - 2021
+Product Owner de un marketplace B2C: historias de usuario, backlog refinement, go-to-market de nuevas categorías, pricing y
+monetización. Colaboré con diseño en Figma y con ingeniería en la definición de APIs.
+
+EDUCACIÓN
+Universidad de Buenos Aires - Licenciatura en Administración     2010 - 2015
+
+IDIOMAS: Español nativo, Inglés avanzado
